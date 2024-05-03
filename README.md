@@ -1,1 +1,2 @@
-# ecs170
+# ECS170 Project
+Movie Recommender using Reinforcement Learning
