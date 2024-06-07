@@ -10,7 +10,7 @@ import knntools
 import warnings
 warnings.filterwarnings('ignore')
 
-tracks = pd.read_csv('spotify_data.csv')
+tracks = pd.read_csv('../spotify_data.csv')
 
 tracks['artist_name'] = tracks['artist_name'].str.strip().str.lower()
 tracks['track_name'] = tracks['track_name'].str.strip().str.lower()
