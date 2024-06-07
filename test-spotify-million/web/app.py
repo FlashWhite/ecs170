@@ -10,23 +10,18 @@ from io import BytesIO
 import sys
 import os
 
-# Get the parent directory of the current script's directory
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
-# Add the parent directory to the Python path
 sys.path.append(parent_dir)
-
-# Now you can import knntools
 from knn import knntools
 
 
 app = Flask(__name__)
 CORS(app)
 
-# Initialize an S3 client
+# init s3
 s3 = boto3.client('s3')
 
-# Function to load CSV file from S3
+# load csv
 def load_csv_from_s3(bucket_name, key):
     try:
         obj = s3.get_object(Bucket=bucket_name, Key=key)
@@ -36,15 +31,13 @@ def load_csv_from_s3(bucket_name, key):
         print(f"Error loading file from S3: {e}")
         return None
 
-# Specify your S3 bucket name and file key
 bucket_name = 'spotifydatacsv'
 file_key = 'spotify_data.csv'
 
-# Load CSV file from S3
 tracks = load_csv_from_s3(bucket_name, file_key)
 
 if tracks is not None:
-    # Load and preprocess data
+    # preprocess data
     tracks['artist_name'] = tracks['artist_name'].str.strip().str.lower()
     tracks['track_name'] = tracks['track_name'].str.strip().str.lower()
     tracks['genre'] = tracks['genre'].str.strip().str.lower()
@@ -52,13 +45,12 @@ if tracks is not None:
     tracks.dropna(inplace=True)
     tracks = pd.get_dummies(tracks, columns=['genre'])
 
-    # Encode artist and track names
+    # encode artist and track names
     le_artist = LabelEncoder()
     le_track = LabelEncoder()
     tracks['artist_name'] = le_artist.fit_transform(tracks['artist_name'])
     tracks['track_name'] = le_track.fit_transform(tracks['track_name'])
 
-    # Feature columns
     features = ['danceability', 'energy', 'key', 'loudness', 'mode',
                 'speechiness', 'acousticness', 'instrumentalness', 'liveness',
                 'valence', 'tempo', 'duration_ms', 'time_signature']
@@ -73,11 +65,9 @@ if tracks is not None:
     scaler_knn = StandardScaler()
     scaled_features = scaler_knn.fit_transform(tracks[feature_columns])
 
-    # KNN model
     knn = NearestNeighbors(n_neighbors=11)
     knn.fit(scaled_features)
 
-    # KMeans model
     kmeans = KMeans(n_clusters=10, random_state=42)
     tracks['cluster'] = kmeans.fit_predict(kmeans_scaled_features)
 
@@ -141,36 +131,32 @@ def recommend_songs_kmeans(inputTrackName, inputArtistName, feature_columns, sca
     inputTrackFeatures = inputTrack[feature_columns]
     scaledInputTrackFeatures = scaler.transform(inputTrackFeatures)
 
-    # Predict cluster for the input track
+    # predict cluster
     inputCluster = kmeans.predict(scaledInputTrackFeatures)[0]
     print(f"Predicted cluster: {inputCluster}")
 
-    # Get tracks from the same cluster
+    # get tracks from same cluster
     similarTracks = tracks[tracks['cluster'] == inputCluster]
-    # Exclude input track from recommendations
     similarTracks = similarTracks[(similarTracks['track_name'] != track_name_encoded) | (similarTracks['artist_name'] != artist_name_encoded)]
 
-    # Calculate the distances to the input track
+    # distance
     similarTracksFeatures = scaler.transform(similarTracks[feature_columns])
     distances = euclidean_distances(scaledInputTrackFeatures, similarTracksFeatures).flatten()
-    # Add distances to the dataframe
     similarTracks['distance'] = distances
 
-    # Sort by distance and select top 10
+    # sort by distance and select top 10
     recommendations = similarTracks.sort_values(by=['distance', 'popularity'], ascending=[True, False]).drop_duplicates(subset=['artist_name', 'track_name']).head(n_recommendations)
     if len(recommendations) < n_recommendations:
-        # Fill remaining recommendations with similar tracks if duplicates
+        # fill remaining recommendations with similar tracks if duplicates
         remaining = similarTracks[~similarTracks.index.isin(recommendations.index)].head(n_recommendations - len(recommendations))
         recommendations = pd.concat([recommendations, remaining])
 
-    # Transform artist and track names back to their original string values
     recommendations['artist_name'] = le_artist.inverse_transform(recommendations['artist_name'])
     recommendations['track_name'] = le_track.inverse_transform(recommendations['track_name'])
 
     print("Recommendations:")
     print(recommendations)
 
-    # Check if genre column exists before trying to include it in the return
     columns_to_return = ['artist_name', 'track_name', 'popularity', 'year']
     if 'genre' in tracks.columns:
         columns_to_return.append('genre')
