@@ -46,6 +46,16 @@ def find_similar_songs(input_song, df, knn, scaler, le_artist, le_track):
     input_song_encoded['track_name'] = le_track.transform([input_song_encoded['track_name'].lower().strip()])[0]
 
     input_song_df = pd.DataFrame([input_song_encoded])
+
+    if 'cluster' in df.columns:
+        df = df.drop(columns=['cluster'])
+
+    input_song_df = input_song_df[df.columns[:-1]]
+
+    for column in df.columns:
+        if column not in input_song_df.columns:
+            input_song_df[column] = 0
+    
     input_song_scaled = scaler.transform(input_song_df)
 
     distances, indices = knn.kneighbors(input_song_scaled)
