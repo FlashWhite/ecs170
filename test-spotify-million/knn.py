@@ -42,12 +42,12 @@ scaled_features = scaler.fit_transform(tracks)
 
 scaled_tracks = pd.DataFrame(scaled_features, columns=tracks.columns)
 
-for i in tracks.columns.tolist():
-    if "genre" in i:
-        print(i)
+# for i in tracks.columns.tolist():
+#     if "genre" in i:
+#         print(i)
 
 
-k = 6
+k = 11
 
 knn = NearestNeighbors(n_neighbors=k, algorithm='auto')
 knn.fit(scaled_tracks)
