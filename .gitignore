@@ -1,2 +1,7 @@
 .vscode
 spotify_data.csv
+
+.env
+.cache
+test-spotify-million/data
+test-spotify-million/intermediate.csv
