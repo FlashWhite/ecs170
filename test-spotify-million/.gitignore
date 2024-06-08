@@ -1,2 +1,6 @@
 .vercel
 spotify_data.csv
+spotify_million_playlist_dataset/
+.env
+Procfile
+requirements.txt
