@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Song Recommender</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Song Recommender</h1>
+      <form id="songForm">
+        <label for="songName">Song Name:</label>
+        <div class="input-group">
+          <input type="text" id="songName" name="songName" required />
+        </div>
+        <label for="artistName">Artist Name:</label>
+        <div class="input-group">
+          <input type="text" id="artistName" name="artistName" required />
+        </div>
+        <label for="model">Recommendation Model:</label>
+        <div class="input-group">
+          <select id="model" name="model">
+            <option value="knn">KNN</option>
+            <option value="kmeans">KMeans</option>
+          </select>
+        </div>
+        <button type="submit">Get Recommendations</button>
+      </form>
+      <div id="recommendations"></div>
+    </div>
+    <script src="scripts.js"></script>
+  </body>
+</html>
