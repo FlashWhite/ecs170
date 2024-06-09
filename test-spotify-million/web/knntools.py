@@ -55,7 +55,7 @@ def find_similar_songs(input_song, df, knn, scaler, le_artist, le_track):
     for column in df.columns:
         if column not in input_song_df.columns:
             input_song_df[column] = 0
-    
+            
     input_song_scaled = scaler.transform(input_song_df)
 
     distances, indices = knn.kneighbors(input_song_scaled)

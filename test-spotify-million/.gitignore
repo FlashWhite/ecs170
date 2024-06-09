@@ -2,5 +2,7 @@
 spotify_data.csv
 spotify_million_playlist_dataset/
 .env
+.cache
+cosine.ipynb
 Procfile
 requirements.txt
