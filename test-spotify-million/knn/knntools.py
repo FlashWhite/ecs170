@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
+import random
 
 
 
@@ -25,8 +26,9 @@ def find_song(artist_name, track_name, df, le_artist, le_track):
     else:
         return "Song not found in the dataset."    
 
-def get_random_song(df, le_artist, le_track):
-    random_index = np.random.randint(0, len(df))
+def get_random_song(df, le_artist, le_track, seed):
+    random.seed(seed)
+    random_index = random.randint(0, len(df))
     random_song = df.iloc[random_index]
 
     # Decode the artist and track names
