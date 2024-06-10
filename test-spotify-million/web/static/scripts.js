@@ -8,7 +8,8 @@ document.getElementById('songForm').addEventListener('submit', async function(e)
     console.log('Sending request with:', { songName, artistName, model });
 
     try {
-        const response = await fetch(`http://127.0.0.1:5000/recommend`, {
+        displayLoading(true);
+        const response = await fetch(`/recommend`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -23,10 +24,29 @@ document.getElementById('songForm').addEventListener('submit', async function(e)
         const data = await response.json();
         console.log('Received recommendations:', data);
         displayRecommendations(data);
+        displayLoading(false);
     } catch (error) {
         console.error('Fetch error:', error);
+        displayLoading(false);
     }
 });
+
+function displayLoading(show) {
+    const loadingDiv = document.getElementById('loading');
+    const submitButton = document.getElementById('submit');
+    if(show) {
+        // display loading text
+        loadingDiv.style.display = 'block';
+        loadingDiv.innerHTML = 'Loading...';
+
+        submitButton.disabled = true;
+    } else {
+        loadingDiv.style.display = 'none';
+        loadingDiv.innerHTML = '';
+
+        submitButton.disabled = false;
+    }
+}
 
 function displayRecommendations(recommendations) {
     const recommendationsDiv = document.getElementById('recommendations');

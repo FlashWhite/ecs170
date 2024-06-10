@@ -5,3 +5,6 @@ spotify_data.csv
 .cache
 test-spotify-million/data
 test-spotify-million/intermediate.csv
+
+__pycache__/
+.DS_Store
