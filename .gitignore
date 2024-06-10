@@ -8,6 +8,3 @@ test-spotify-million/intermediate.csv
 
 __pycache__/
 .DS_Store
-
-!test-spotify-million/web/requirements.txt
-!test-spotify-million/web/spotify_data.csv
