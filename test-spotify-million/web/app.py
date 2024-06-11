@@ -8,6 +8,7 @@ from sklearn.metrics.pairwise import euclidean_distances
 import boto3
 from io import BytesIO
 import knntools
+from sklearn.cluster import DBSCAN
 
 app = Flask(__name__)
 CORS(app)
