@@ -5,6 +5,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import euclidean_distances
+from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
+from sklearn.metrics.pairwise import cosine_similarity
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -104,9 +106,57 @@ def recommendSongs(user_playlist: pd.DataFrame, k=5, n_recs=10) -> pd.DataFrame:
 
     # Sort by Euclidean distance and select top n_recs
     recommendations = relevant_tracks.sort_values(by=['distance'], ascending=[True]).drop_duplicates(subset=['track_id']).head(n_recs)
-    return recommendations
+    return [user_centroid, recommendations]
+
+
+
+def calculate_clustering_metrics(k=5):
+    features = ['danceability','energy','key','loudness','mode','speechiness','acousticness','instrumentalness','liveness','valence','tempo','duration_ms','time_signature']
+    centroids_df = pd.read_csv('centroids_with_clusters.csv')
+    # Drop the 'cluster' column from centroids_df to exclude it from the input
+    if 'cluster' in centroids_df.columns:
+        centroids_df = centroids_df.drop(columns=['cluster'])
+    kmeans = KMeans(n_clusters=k)
+    # Standardize Feature Columns
+    scaler = StandardScaler()
+    scaled_centroids_df = scaler.fit_transform(centroids_df[features])
+    # KMeans Cluster
+    kmeans.fit(scaled_centroids_df)
+    cluster_labels = kmeans.labels_
+    # Calculate Silhouette Score
+    silhouette = silhouette_score(scaled_centroids_df, cluster_labels)
+    
+    # Calculate Davies-Bouldin Index
+    davies_bouldin = davies_bouldin_score(scaled_centroids_df, cluster_labels)
+    
+    # Calculate Calinski-Harabasz Index
+    calinski_harabasz = calinski_harabasz_score(scaled_centroids_df, cluster_labels)
+
+    return [silhouette, davies_bouldin, calinski_harabasz]
+
+
 
 # driver code
-user_playlist = pd.read_csv('../Playlists/hedgehogs_dilemma.csv')
-recommendations = recommendSongs(user_playlist)
-print(recommendations)
+metrics = calculate_clustering_metrics()
+print(metrics)
+
+features = ['danceability','energy','key','loudness','mode','speechiness','acousticness','instrumentalness','liveness','valence','tempo','duration_ms','time_signature']
+pl1 = pd.read_csv('../Playlists/hedgehogs_dilemma.csv')
+pl2 = pd.read_csv('../Playlists/hers.csv')
+pl3 = pd.read_csv('../Playlists/you_wanna_rock.csv')
+
+users = [pl1, pl2, pl3]
+results = []
+for i in range(3): 
+    user_centroid, recs = recommendSongs(users[i])
+    user_centroid = user_centroid[features]
+    recs = recs[features]
+    centroid_vec = recs.mean(axis=0)
+    pl_centroid = pd.DataFrame(centroid_vec).transpose()
+    print(f"Playlist {i}")
+    print(user_centroid)
+    print(pl_centroid)
+    results.append(cosine_similarity(user_centroid, pl_centroid))
+
+print(results)
+print(sum(results)/3) # small sample size of 3, larger sample size in helper.ipynb
