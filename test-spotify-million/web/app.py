@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler
@@ -8,25 +8,28 @@ from sklearn.metrics.pairwise import euclidean_distances
 import boto3
 from io import BytesIO
 import knntools
+from sklearn.cluster import DBSCAN
 
 app = Flask(__name__)
 CORS(app)
 
-# s3
-s3 = boto3.client('s3')
+# # s3
+# s3 = boto3.client('s3')
 
-# load csv
-def load_csv_from_s3(bucket_name, key):
-    try:
-        obj = s3.get_object(Bucket=bucket_name, Key=key)
-        df = pd.read_csv(BytesIO(obj['Body'].read()))
-        return df
-    except Exception as e:
-        print(f"Error loading file from S3: {e}")
-        return None
-bucket_name = 'spotifydatacsv'
-file_key = 'spotify_data.csv'
-tracks = load_csv_from_s3(bucket_name, file_key)
+# # load csv
+# def load_csv_from_s3(bucket_name, key):
+#     try:
+#         obj = s3.get_object(Bucket=bucket_name, Key=key)
+#         df = pd.read_csv(BytesIO(obj['Body'].read()))
+#         return df
+#     except Exception as e:
+#         print(f"Error loading file from S3: {e}")
+#         return None
+# bucket_name = 'spotifydatacsv'
+# file_key = 'spotify_data.csv'
+
+# read from local file "spotify_data.csv"
+tracks = pd.read_csv('spotify_data.csv')
 
 if tracks is not None:
     # load and preprocess data
@@ -152,5 +155,13 @@ def recommend_songs_kmeans(inputTrackName, inputArtistName, feature_columns, sca
 
     return recommendations[columns_to_return].to_dict(orient='records')
 
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
+@app.route('/<path:path>', methods=['GET'])
+def static_files(path):
+    return app.send_static_file(path)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, host='0.0.0.0', port=5005)

@@ -23,10 +23,12 @@
           <select id="model" name="model">
             <option value="knn">KNN</option>
             <option value="kmeans">KMeans</option>
+            <!-- <option value="kmeans">DBSCAN</option> -->
           </select>
         </div>
-        <button type="submit">Get Recommendations</button>
+        <button type="submit" id="submit">Get Recommendations</button>
       </form>
+      <div id="loading"></div>
       <div id="recommendations"></div>
     </div>
     <script src="scripts.js"></script>

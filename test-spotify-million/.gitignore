@@ -5,4 +5,4 @@ spotify_million_playlist_dataset/
 .cache
 cosine.ipynb
 Procfile
-requirements.txt
+# requirements.txt
