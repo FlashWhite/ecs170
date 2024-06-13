@@ -60,7 +60,25 @@ function displayRecommendations(recommendations) {
     recommendations.forEach(rec => {
         const recDiv = document.createElement('div');
         recDiv.className = 'recommendation';
-        recDiv.innerHTML = `<p><strong>${rec.track_name}</strong> by ${rec.artist_name}</p>`;
+        const ytSearchLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(rec.track_name)}+by+${encodeURIComponent(rec.artist_name)}`;
+        recDiv.innerHTML = `<a href="${ytSearchLink}" target="_blank"><p><strong>${rec.track_name}</strong> by ${rec.artist_name}</p></a>`;
         recommendationsDiv.appendChild(recDiv);
     });
+}
+
+async function fillWithRandomSong() {
+    const response = await fetch(`/random`);
+
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+
+    // set input for songName to song_name in json
+    document.getElementById('songName').value = data.track_name;
+    // set input for artistName to artist_name in json
+    document.getElementById('artistName').value = data.artist_name;
+
+    console.log('Filled with random song:', data);
 }

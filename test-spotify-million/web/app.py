@@ -66,6 +66,20 @@ if tracks is not None:
     kmeans = KMeans(n_clusters=10, random_state=42)
     tracks['cluster'] = kmeans.fit_predict(kmeans_scaled_features)
 
+@app.route('/random', methods=['GET'])
+def random():
+    if tracks is None:
+        return jsonify({"error": "Failed to load data"}), 500
+
+    random_tracks = tracks.sample(1)
+
+    # json return artist_name, track_name
+    random_track = random_tracks.iloc[0]
+    artist_name = le_artist.inverse_transform([random_track['artist_name']])[0]
+    track_name = le_track.inverse_transform([random_track['track_name']])[0]
+
+    return jsonify({"artist_name": artist_name, "track_name": track_name})
+
 @app.route('/recommend', methods=['POST'])
 def recommend():
     data = request.json

@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Song Recommender</title>
+    <title>ECS 170 Group 20 Project: Song Recommender</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="container">
-      <h1>Song Recommender</h1>
+      <h1>Song Recommender Demo</h1>
+      <h2>ECS 170 SQ24<br/>Group 20 Project</h2>
       <form id="songForm">
         <label for="songName">Song Name:</label>
         <div class="input-group">
@@ -18,6 +19,8 @@
         <div class="input-group">
           <input type="text" id="artistName" name="artistName" required />
         </div>
+        <span>Having a hard time picking a song? <span type="button" onclick="fillWithRandomSong()" class="random">Try filling with a random song?</span></span>
+        <br /><br/>
         <label for="model">Recommendation Model:</label>
         <div class="input-group">
           <select id="model" name="model">
